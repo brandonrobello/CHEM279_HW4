@@ -16,12 +16,13 @@
 
 Atom::Atom(int atomicNumber, double x, double y, double z)
     : atomicNumber_(atomicNumber), x_(x), y_(y), z_(z) {
-    if (atomicNumber_ == 6) { // Carbon contributes 4 orbital basis functions and 4 electrons
-        N_ = 4;
-        ValElectrons_ = 4; 
-    } else if (atomicNumber_ == 1) { // Hydrogen contributes 1 basis function and 1 electron
+    if (atomicNumber_ == 1) { // Hydrogen contributes 1 basis function and 1 electron
         N_ = 1;
         ValElectrons_ = 1;
+    }
+    else if (atomicNumber_ == 6) { // Carbon contributes 4 orbital basis functions and 4 electrons
+        N_ = 4;
+        ValElectrons_ = 4; 
     } else if (atomicNumber_ == 7) { // Nitrogen contributes 4 orbital basis functions  and 5 electrons
         N_ = 4;
         ValElectrons_ = 5;

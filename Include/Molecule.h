@@ -1,6 +1,6 @@
 // Chem279: Numerical Algorithms Applied to Computational Quantum Chemistry  
 // Creator: Brandon Robello
-// Date Created: 10/18/24
+// Date Adapted: 11/8/24
 //
 // Molecule.h contains the necessary include files and 
 //        C++ Class declarations for Molecule class
@@ -25,24 +25,20 @@
 
 // Define a struct to hold the semi-empirical parameters for each element
 struct CNDO2Parameters {
-    double IA_s;  // Value for 1/2 (Is + As)
-    double IA_p;  // Value for 1/2 (Ip + Ap)
-    double beta;   // Value for -β
+    double IA_s;  ///< Semi-empirical parameter for s-orbital (1/2 (Is + As)).
+    double IA_p;  ///< Semi-empirical parameter for p-orbital (1/2 (Ip + Ap)).
+    double beta;  ///< Semi-empirical parameter for bonding interaction (-β).
 };
 
 
 /**
  * @class Molecule
  * 
- * @brief Represents a Molecule object with its vector of Atoms and associated basis functions.
+ * @brief Represents a molecular system in quantum chemistry with its atoms, basis functions, and quantum matrices.
  * 
- * The Molecule class models a molecular system in quantum chemistry, storing information about its
- * atoms, basis functions, and quantum matrices such as the overlap matrix, Hamiltonian matrix, and molecular
- * orbital coefficients. It provides functionality to compute overlaps between Gaussian basis functions,
- * build the Hamiltonian, and calculate the total energy of the molecule.
- * 
- * The class also allows for the construction of atomic and basis function information,
- * with methods to print the overlap and Hamiltonian matrices.
+ * The Molecule class stores information about the atoms, basis functions, and quantum matrices such as
+ * the overlap matrix, Hamiltonian matrix, and molecular orbital coefficients. It supports computing overlaps,
+ * building the Hamiltonian, and calculating the molecule's total energy.
  * 
  * @details
  * - **atoms_**: Vector storing the atoms that make up the molecule.
@@ -87,18 +83,6 @@ public:
     void addAtom(const Atom& atom);
 
     /**
-     * @brief Returns the number of basis functions in the molecule.
-     * @return int Number of basis functions.
-     */
-    int getN() const;
-
-    /**
-     * @brief Returns the number of valence electrons in the molecule.
-     * @return int Number of valence electrons.
-     */
-    int getValElectrons() const;
-
-    /**
      * @brief Returns the vector of atoms in the molecule.
      * @return std::vector<Atom> A vector of atoms.
      */
@@ -108,33 +92,19 @@ public:
      * @brief Prints the basis functions of the molecule.
      */
     void printBasisFunctions() const;
+
     /**
      * @brief Prints the overlap matrix of the molecule.
      */
     void printS() const;
 
     /**
-     * @brief Prints the 
+     * @brief Prints the electron repulsion integral (gamma) matrix of the molecule.
      */
     void printGamma() const;
-
+    
     /**
-     * @brief Prints the orthogonalized overlap matrix (X) matrix of the molecule.
-     */
-    void printX() const;
-
-    /**
-     * @brief Prints the Molecular Orbital Coefficients matrix (C) matrix of the molecule.
-     */
-    void printC() const;
-
-    /**
-     * @brief Prints the Molecular Orbital Overlap matrix (MO_S) of the molecule.
-     */ 
-    void printMO_S() const;
-
-        /**
-     * @brief Print
+     * @brief Prints the Hamiltonian (H matrix) of the molecule.
      */ 
     void printH() const;
 
@@ -167,67 +137,38 @@ public:
 
     /**
      * @brief Constructs the overlap matrix for the molecule.
-     * 
-     * This method computes the full overlap matrix for the molecule, storing it in S_overlap_matrix_.
      */
     void calculate_overlap_matrix();
 
     /**
-     * @brief Builds the Hamiltonian matrix for the molecule.
-     * 
-     * Constructs the Hamiltonian matrix for the molecule and stores it in H_matrix_.
-     */
-    void build_hamiltionian();
-
-    /**
-     * @brief Constructs the orthogonalized X matrix for the molecule.
-     * 
-     * This method computes the X matrix, which is used to orthogonalize the overlap matrix (S_overlap_matrix_).
-     * The X matrix is essential for transforming the Hamiltonian into an orthogonal basis, which simplifies
-     * solving the eigenvalue problem.
-     */
-    void build_X();
-
-    /**
-     * @brief Constructs the molecular orbital coefficient matrix (C_matrix_).
-     * 
-     * This method computes the molecular orbital coefficients (C_matrix_) by solving the
-     * eigenvalue equation for the Hamiltonian matrix in the orthogonal basis. The resulting
-     * coefficients describe the molecular orbitals as linear combinations of the basis functions.
-     */
-    void build_C();
-
-/**
-     * @brief Constructs the molecular orbital overlap matrix (MO_S_matrix_).
-     * 
-     * This method calculates the overlap matrix in the molecular orbital basis (MO_S_matrix_) 
-     * by transforming the overlap matrix from the atomic orbital basis using the molecular 
-     * orbital coefficients.
-     */
-    void build_MO_S();
-
-    /**
      * @brief Calculates the total electronic energy of the molecule.
      * 
-     * This function computes the total electronic energy of the molecule using the Hamiltonian and
-     * the molecular orbital coefficients. The total energy includes the kinetic energy of the electrons
-     * and their interactions with the nuclei and each other.
+     * Computes the total electronic energy of the molecule using the Hamiltonian and
+     * molecular orbital coefficients.
      * 
      * @return double The total electronic energy of the molecule.
      */
     double calc_totalE();
 
-    void build_Fmatrix_wSCF();
+    /**
+     * @brief Builds the Fock matrix for the molecule with Self-Consistent Field (SCF) iterations.
+     * 
+     * @param verbose If true, prints additional debug information.
+     */
+    void build_Fmatrix_wSCF(bool verbose = false);
 
-    void calculate_gamma();
-
-    void build_core_hamiltonian();
+    /**
+     * @brief Prints energies to a specified file.
+     * 
+     * @param file The filename to output energies to.
+     */
+    void printEnergies(const std::string& file) const;
 
 private:
     /**
-     * @brief Builds the basis functions for a given atom.
+     * @brief Builds basis functions for a given atom.
      * 
-     * This private method initializes the basis functions for an atom and adds them to the molecule's basis function list.
+     * Initializes the basis functions for an atom and adds them to the molecule's basis functions list.
      * 
      * @param atom The Atom object for which to build basis functions.
      */
@@ -235,40 +176,45 @@ private:
     
     /**
      * @brief Initializes molecule properties, including valence electrons and basis functions.
-     * 
-     * Called by the constructor to set up the initial state of the molecule.
      */
-    void Molecule_init();                       
+    void Molecule_init();            
 
+// Class members for storing atoms, basis functions, matrices, and properties
     std::vector<Atom> atoms_;                   ///< Vector containing the atoms of the molecule.
-    std::vector<BasisFunction> basisFunctions_; ///< Store the list basis functions
-    arma::mat S_overlap_matrix_;                ///< Overlap Matrix
-    arma::mat FA_matrix_;                       ///< Alpha Fock Matrix
-    arma::mat FB_matrix_;                       ///< Beta Fock Matrix
-    arma::mat pA_matrix_;                       ///< Alpha Denisty Matrix
-    arma::mat pB_matrix_;                       ///< Beta Denisty Matrix
-    arma::mat H_core_matrix_;
-    arma::mat pTot_mu_nu_;
-    arma::vec pTot_;                            ///< Total density vector for each atom
-    arma::mat VA_matrix_;                       ///< Alpha Eigen vectors Matrix
-    arma::mat VB_matrix_;                       ///< Beta Eigen vectors Matrix
-    arma::vec epsilon_A_;                        ///< Alpha Eigen values vector
-    arma::vec epsilon_B_;                        ///< Beta Eigen values vector
-    arma::mat cA_matrix_;                       ///< Alpha MO coefficients Matrix
-    arma::mat cB_matrix_;                       ///< Beta MO coefficients Matrix
-    arma::mat gamma_matrix_;
+    std::vector<BasisFunction> basisFunctions_; ///< List of basis functions in the molecule.
+    arma::mat S_overlap_matrix_;                ///< Overlap matrix for basis functions.
+    arma::mat FA_matrix_;                       ///< Alpha Fock matrix.
+    arma::mat FB_matrix_;                       ///< Beta Fock matrix.
+    arma::mat pA_matrix_;                       ///< Alpha density matrix.
+    arma::mat pB_matrix_;                       ///< Beta density matrix.
+    arma::mat H_core_matrix_;                   ///< Core Hamiltonian matrix.
+    arma::mat pTot_mu_nu_;                      ///< Total density matrix.
+    arma::vec pTot_;                            ///< Total density vector for each atom.
+    arma::mat VA_matrix_;                       ///< Alpha eigenvectors matrix.
+    arma::mat VB_matrix_;                       ///< Beta eigenvectors matrix.
+    arma::vec epsilon_A_;                       ///< Alpha eigenvalues vector.
+    arma::vec epsilon_B_;                       ///< Beta eigenvalues vector.
+    arma::mat cA_matrix_;                       ///< Alpha MO coefficients matrix.
+    arma::mat cB_matrix_;                       ///< Beta MO coefficients matrix.
+    arma::mat gamma_matrix_;                    ///< Gamma matrix for electron repulsion.
     int N_ = 0;                                 ///< Number of basis functions in the molecule.
-    int val_electrons_ = 0;                     ///< Number of valence electrons in the molecule
-    int numCarbons_ = 0;                        ///< Number of carbon atoms
-    int numHydrogens_ = 0;                      ///< Number of hydrogen atoms
-    int alpha_e_, beta_e_ = 0;                  ///< num of p and q electrons in the MO
-    int alpha_electron_E_, beta_electron_E_ = 0;                  ///< 
-    int charge_ = 0;                            ///< Charge of molecule
-    double nuclear_repulsion_E_ = 0;
-    std::unordered_map<int, CNDO2Parameters> semiEmpiricalParams_; ///< Map with semi-empirical parameters
+    int val_electrons_ = 0;                     ///< Number of valence electrons in the molecule.
+    int numCarbons_ = 0;                        ///< Number of carbon atoms.
+    int numHydrogens_ = 0;                      ///< Number of hydrogen atoms.
+    int alpha_e_, beta_e_ = 0;                  ///< Alpha and beta electron counts.
+    double alpha_electron_E_, beta_electron_E_ = 0; ///< Energy associated with alpha and beta electrons.
+    int charge_ = 0;                            ///< Total charge of the molecule.
+    double nuclear_repulsion_E_ = 0;            ///< Nuclear repulsion energy.
+    double total_energy_ = 0;                   ///< Total electronic energy.
+    std::unordered_map<int, CNDO2Parameters> semiEmpiricalParams_ = { // Map with semi-empirical parameters for H, C, N, O, F
+        {1, {7.176, 0.0, -9}},    // H: Ionization energy and beta (only s-orbital)
+        {6, {14.051, 5.572, -21}}, // C: Ionization and p-orbital values
+        {7, {19.316, 7.275, -25}}, // N: Ionization and p-orbital values
+        {8, {25.390, 9.111, -31}}, // O: Ionization and p-orbital values
+        {9, {32.272, 11.080, -39}} // F: Ionization and p-orbital values
+    };
 
     // Helper Functions for build and calculate functions
-    
     /**
      * @brief Calculates the exponential prefactor for Gaussian overlap in one dimension.
      */
@@ -301,30 +247,60 @@ private:
      * @brief Calculates the one-dimensional overlap integral between two Gaussian primitives.
      */
     double Overlap_onedim(double alpha, double beta, double X_A, double X_B, int lA, int lB) const;
-    
-
-    // Returns the diagonal value of the fock matrix for a basis function and current electron density.
-    double diagonal_value(int mu, bool isAlpha) const;
-
-    // Returns the off-diagonal value of the fock matrix for two basis functions.
-    double offDiagonal_value(int mu, int nu, bool isAlpha) const;
-
-    // Builds the Fock matrix for the molecule.
-    arma::mat build_fock_matrix(bool isAlpha);
-
     /**
-     * @brief Get the p and q numbers for the valence electrons and charge of MO
+     * @brief Calculates the gamma (electron repulsion) matrix.
+     */
+    void calculate_gamma();
+    /**
+     * @brief Builds the core Hamiltonian matrix for the molecule.
+     */
+    void build_core_hamiltonian();
+    /**
+     * @brief Returns the number of basis functions in the molecule.
+     */
+    int getN() const;
+    /**
+     * @brief Returns the number of valence electrons in the molecule.
+     */
+    int getValElectrons() const;
+
+    // Hartree-Fock matrix functions (hartreeFock)
+    /**
+     * @brief Returns the diagonal value of the Fock matrix for a basis function.
+     */
+    double diagonal_value(int mu, bool isAlpha) const;
+    /**
+     * @brief Returns the off-diagonal value of the Fock matrix for two basis functions.
+     */
+    double offDiagonal_value(int mu, int nu, bool isAlpha) const;
+    /**
+     * @brief Builds the Fock matrix for the molecule based on the electron density.
+     */
+    arma::mat build_fock_matrix(bool isAlpha);
+    /**
+     * @brief Calculates the number of alpha and beta electrons based on the molecule's configuration.
      */
     void calculate_alpha_beta_electrons();
-
-    // 2-electron integral of two primitive Gaussians
+    /**
+     * @brief Calculates the two-electron integral for two primitive Gaussians.
+     */
     double I2e_pG(arma::vec &Ra, arma::vec &Rb, double sigmaA, double sigmaB) const;
-    // Function to evaluate 2-electron integral for atomic orbitals (s-type)
+    /**
+     * @brief Evaluates the two-electron integral for atomic orbitals of type s.
+     */
     double eval_gamma(const BasisFunction& basisFuncA, const BasisFunction& basisFuncB) const;
-
+    /**
+     * @brief Calculates the total electron density for each atom in the molecule.
+     */
     void calculate_pTot();
-
-    void print_armaMat(const std::string name, const arma::mat& mat) const;
+    /**
+     * @brief Prints the SCF results for each iteration during the Hartree-Fock calculation.
+     */
+    void printSCF(bool converged, int it) const;
 };
+
+void calculateBondEnergy(std::unordered_map<std::string, double>& energies);
+
+std::string getMoleculeName(const std::string& filePath);
 
 #endif

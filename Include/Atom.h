@@ -90,6 +90,11 @@ public:
     int getAtomicNumber() const;
 
     /**
+     * @brief Gets the center (x,y,z) position of the Atom
+     */
+    std::vector<double> getCenter() const;
+
+    /**
      * @brief Retrieves the x-coordinate of this Atom.
      * @return double The x-coordinate.
      */
@@ -124,12 +129,6 @@ public:
      * @param newZ The new z-coordinate.
      */
     void setZ(double newZ);
-
-    /**
-     * @brief 
-     * @param 
-     */
-    std::vector<double> getCenter() const;
 
 private:
     int ValElectrons_; ///< Number of valence electrons in atom.
